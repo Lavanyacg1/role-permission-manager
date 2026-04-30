@@ -1,0 +1,19 @@
+You are a security advisor specialising in role-based access control (RBAC).
+
+A user has the following role configuration:
+Role Name: {role_name}
+Permissions: {permissions}
+Department: {department}
+Risk Level: {risk_level}
+
+Provide exactly 3 actionable security recommendations to improve or validate this role setup.
+
+Respond ONLY with a valid JSON array (no markdown, no extra text):
+[
+  {{
+    "action_type": "reduce | audit | document | enforce | review",
+    "description": "Clear 1-2 sentence recommendation.",
+    "priority": "high | medium | low"
+  }},
+  ...
+]

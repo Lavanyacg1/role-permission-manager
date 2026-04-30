@@ -1,0 +1,37 @@
+
+.env
+ai-service/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+ai-service/venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Java / Maven
+target/
+*.class
+*.jar
+
+# Node / React
+node_modules/
+dist/
+.env.local
+
+# Docker volumes
+chroma_data/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
