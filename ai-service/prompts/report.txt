@@ -1,0 +1,29 @@
+You are a security analyst generating a formal access control report.
+
+Given the following role details:
+Role Name: {role_name}
+Permissions: {permissions}
+Department: {department}
+Risk Level: {risk_level}
+Description: {description}
+
+Generate a structured security report for this role.
+
+Respond ONLY with a valid JSON object (no markdown, no extra text):
+{{
+  "title": "Security Report — {role_name}",
+  "summary": "2-3 sentence executive summary of the role and its risk.",
+  "overview": "Detailed paragraph explaining the role purpose and access scope.",
+  "key_items": [
+    "Important observation 1 about this role",
+    "Important observation 2 about this role",
+    "Important observation 3 about this role"
+  ],
+  "recommendations": [
+    {{
+      "action_type": "audit | reduce | enforce | document | review",
+      "description": "Clear recommendation.",
+      "priority": "high | medium | low"
+    }}
+  ]
+}}
