@@ -1,8 +1,11 @@
 import json
 import re
 import logging
+import time
 from flask import Blueprint, request, jsonify
 from services.groq_client import call_groq
+from services.cache import make_cache_key, get_cached, set_cached
+from routes.health import record_response_time
 
 logger = logging.getLogger(__name__)
 recommend_bp = Blueprint("recommend", __name__)
@@ -15,11 +18,7 @@ FALLBACK_RECOMMENDATIONS = [
 ]
 
 def sanitize(value: str) -> str:
-    """Strip HTML tags and basic prompt injection patterns."""
-    # Strip HTML tags
     value = re.sub(r"<[^>]+>", "", value)
-    
-    # Block full sentence injection attempts — if detected, replace entire value
     injection_patterns = [
         r"ignore.{0,30}(above|previous|instruction)",
         r"forget.{0,30}(above|previous|instruction)",
@@ -33,8 +32,7 @@ def sanitize(value: str) -> str:
     ]
     for pattern in injection_patterns:
         if re.search(pattern, value, flags=re.IGNORECASE):
-            return "unknown"   # ← entire value replaced, nothing leaks through
-    
+            return "unknown"
     return value.strip()
 
 def load_prompt(role_name, permissions, department, risk_level) -> str:
@@ -62,15 +60,36 @@ def recommend():
     department  = sanitize(str(data["department"]))
     risk_level  = sanitize(str(data.get("risk_level", "medium")))
 
+    # Check cache first
+    cache_key = make_cache_key("recommend", {
+        "role_name": role_name,
+        "permissions": permissions,
+        "department": department,
+        "risk_level": risk_level
+    })
+    cached = get_cached(cache_key)
+    if cached:
+        cached["from_cache"] = True
+        return jsonify(cached), 200
+
+    # Call Groq and track time
+    start = time.time()
     prompt   = load_prompt(role_name, permissions, department, risk_level)
     messages = [{"role": "user", "content": prompt}]
 
     try:
         raw = call_groq(messages, temperature=0.4)
+        duration = time.time() - start
+        record_response_time(duration)
+
         recommendations = json.loads(raw)
         if not isinstance(recommendations, list) or len(recommendations) < 1:
             raise ValueError("Expected a JSON array")
-        return jsonify({"recommendations": recommendations[:3]}), 200
+
+        result = {"recommendations": recommendations[:3], "from_cache": False}
+        set_cached(cache_key, result)
+        return jsonify(result), 200
+
     except (json.JSONDecodeError, ValueError) as e:
         logger.error(f"/recommend parse error: {e} | raw: {raw}")
         return jsonify({"recommendations": FALLBACK_RECOMMENDATIONS, "is_fallback": True}), 200
