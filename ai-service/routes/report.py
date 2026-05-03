@@ -78,7 +78,7 @@ def generate_report():
     messages = [{"role": "user", "content": prompt}]
 
     try:
-        raw = call_groq(messages, temperature=0.3, max_tokens=1200)
+        raw = call_groq(messages, temperature=0.3, max_tokens=500)
         result = json.loads(raw)
         result["generated_at"] = datetime.now(timezone.utc).isoformat()
         result["is_fallback"] = False

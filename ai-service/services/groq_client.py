@@ -21,6 +21,7 @@ def call_groq(messages: list, temperature: float = 0.3, max_tokens: int = 800) -
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                stream=False,
             )
             return response.choices[0].message.content
         except Exception as e:

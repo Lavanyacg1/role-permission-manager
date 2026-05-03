@@ -78,7 +78,7 @@ def recommend():
     messages = [{"role": "user", "content": prompt}]
 
     try:
-        raw = call_groq(messages, temperature=0.4)
+        raw = call_groq(messages, temperature=0.4, max_tokens=300)
         duration = time.time() - start
         record_response_time(duration)
 
