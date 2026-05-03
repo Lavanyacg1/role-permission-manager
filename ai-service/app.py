@@ -5,6 +5,9 @@ from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 
 load_dotenv()
+# ── Pre-load AI model at startup ──────────────────────────
+from services.embeddings import load_model
+load_model()
 
 app = Flask(__name__)
 
