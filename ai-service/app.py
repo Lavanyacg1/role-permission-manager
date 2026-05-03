@@ -9,6 +9,10 @@ load_dotenv()
 from services.embeddings import load_model
 load_model()
 
+# ── Seed ChromaDB at startup ──────────────────────────────
+from services.chromadb_service import seed_knowledge
+seed_knowledge()
+
 app = Flask(__name__)
 
 limiter = Limiter(
